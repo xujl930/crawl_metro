@@ -87,9 +87,11 @@ class MetroSpider(Spider):
         sdoor = './td[last()]/text()' # 双边开门 ['左/右侧(富锦路方向)', '\n左侧(莘庄方向)']
         array_station = list()
         idx = 0
-        for stat in stations:
+        for index, stat in enumerate(stations):
             station = StationItem()
 
+            if '6号线' == metro['name']:
+                sdoor = './td[7]/text()' if index ==0  else './td[6]/text()'
             name = self.extract_by_xpath(stat, sname)
             door = self.extract_by_xpath(stat, sdoor)
 
@@ -106,7 +108,7 @@ class MetroSpider(Spider):
                 if r.status_code == 200:
                     sches = json.loads(r.text, encoding='utf-8')
                     for sche in sches:
-                        if sche.get('name') == (Converter('zh-hans').convert(station['name'])):
+                        if sche.get('name') == Converter('zh-hans').convert(station['name']):
                             sche_item = ScheduleItem()
                             sche_item['direction'] = sche.get('description')
                             # 首末班车时间
